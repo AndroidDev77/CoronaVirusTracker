@@ -41,8 +41,6 @@ namespace CoronaVirusTracker
             googleMap.MarkerClick += MapOnMarkerClick;
         }
 
-
-
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -52,7 +50,6 @@ namespace CoronaVirusTracker
             mapFragment = (MapFragment) FragmentManager.FindFragmentById(Resource.Id.map);
             mapFragment.GetMapAsync(this);
         }
-
 
         protected override void OnPause()
         {
@@ -65,7 +62,6 @@ namespace CoronaVirusTracker
 
             base.OnPause();
         }
-
 
         void AddInitialPolarBarToMap()
         {
@@ -104,7 +100,6 @@ namespace CoronaVirusTracker
             circleOptions.InvokeCenter(InMaui);
             circleOptions.InvokeRadius(100.0);
         }
-
 
         void MapOnMarkerClick(object sender, GoogleMap.MarkerClickEventArgs markerClickEventArgs)
         {

@@ -33,22 +33,22 @@ namespace CoronaVirusTracker
 
         LatLng LatLng;
 
-        public int NumCases = 0;
+        public List<Tuple<string, int>> ConfirmedList;
 
         public float radius = 0.0f;
 
-    public Infection(string provinceState, string countryRegion, double Lat, double lon, int numCases) 
+    public Infection(string provinceState, string countryRegion, double Lat, double lon, List<Tuple<string, int>> ConfirmedList) 
         {
             this.ProvinceState = provinceState;
             this.CountryRegion = countryRegion;
             this.LatLng = new LatLng(Lat, lon);
-            this.NumCases = numCases;
+            this.ConfirmedList = ConfirmedList;
 
             MarkerOption = new MarkerOptions()
                 .SetPosition(this.LatLng)
                 .Anchor(0.5f, 0.5f)
                 .SetAlpha(1.0f)
-                .SetTitle("" + this.NumCases)
+                .SetTitle("" + ConfirmedList.Last().Item2)
                 .SetSnippet(this.ProvinceState);
                 //.SetIcon(MakeCircle(dpToPx(CirclePxSize(this.NumCases))));
             

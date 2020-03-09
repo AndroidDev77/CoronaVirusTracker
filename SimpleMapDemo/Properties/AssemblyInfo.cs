@@ -6,7 +6,7 @@ using Android.App;
 [assembly: AssemblyTitle("CoronaVirusTracker")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("AppModilla")]
 [assembly: AssemblyProduct("CoronaVirusTracker")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]

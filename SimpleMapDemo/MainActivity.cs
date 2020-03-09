@@ -15,7 +15,6 @@ namespace CoronaVirusTracker
 {
     using AndroidUri = Uri;
 
-    [Activity(Label = "@string/app_name", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme")]
     public class MainActivity : AppCompatActivity
     {
         public static readonly int RC_INSTALL_GOOGLE_PLAY_SERVICES = 1000;
@@ -41,12 +40,14 @@ namespace CoronaVirusTracker
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.MainActivity);
+            //base.OnCreate(savedInstanceState);
+            //SetContentView(Resource.Layout.MainActivity);
             //SetContentView(Resource.Layout.MapLayout);
-            isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
+            //isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
 
-            InitializeListView();
+            //InitializeListView();
+            //var sampleToStart = SampleMetaDataList[0];
+            //sampleToStart.Start(this);
         }
 
 
@@ -72,15 +73,6 @@ namespace CoronaVirusTracker
         void SampleSelected(object sender, AdapterView.ItemClickEventArgs e)
         {
             var position = e.Position;
-            /*if (position == 0)
-            {
-                var geoUri = AndroidUri.Parse("geo:42.374260,-71.120824");
-                var mapIntent = new Intent(Intent.ActionView, geoUri);
-                StartActivity(mapIntent);
-                return;
-            }*/
-
-
             var sampleToStart = SampleMetaDataList[position];
             sampleToStart.Start(this);
         }
@@ -121,10 +113,10 @@ namespace CoronaVirusTracker
             {
                 var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
                 Log.Error(TAG, "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
-                var errorDialog = GoogleApiAvailability.Instance.GetErrorDialog(this, queryResult, RC_INSTALL_GOOGLE_PLAY_SERVICES);
-                var dialogFrag = new ErrorDialogFragment(errorDialog);
+                //var errorDialog = GoogleApiAvailability.Instance.GetErrorDialog(this, queryResult, RC_INSTALL_GOOGLE_PLAY_SERVICES);
+                //var dialogFrag = new ErrorDialogFragment(errorDialog);
 
-                dialogFrag.Show(FragmentManager, "GooglePlayServicesDialog");
+                //dialogFrag.Show(FragmentManager, "GooglePlayServicesDialog");
             }
 
             return false;

@@ -16,22 +16,43 @@ using Android.Widget;
 using Android.Graphics;
 using static Android.Graphics.Bitmap;
 using Android.Util;
+using Android.Gms.Common;
 
 namespace CoronaVirusTracker
 {
-    [Activity(Label = "@string/activity_label_mapwithmarkers")]
+    
+    [Activity(Label = "@string/activity_label_mapwithmarkers", MainLauncher = true, Icon = "@drawable/icon", Theme = "@style/AppTheme")]
     public class MapWithMarkersActivity : AppCompatActivity, IOnMapReadyCallback
     {
-        static readonly string TAG = "MapWithMarkersActivity";
-        static readonly LatLng PasschendaeleLatLng = new LatLng(36.897778, -76.013333);
-        static readonly LatLng VimyRidgeLatLng = new LatLng(36.379444, -77.773611);
-        static readonly int REQUEST_PERMISSIONS_LOCATION = 1000;
+        public static readonly int RC_INSTALL_GOOGLE_PLAY_SERVICES = 1000;
+        public static readonly string TAG = "CoronaVirusTracker";
+        public static readonly int REQUEST_PERMISSIONS_LOCATION = 1000;
+        bool isGooglePlayServicesInstalled;
         GoogleMap googleMap;
-        List<Infection> Infections;
+        SeekBar TimeBar;
+        TextView TimeText;
+        TextView CaseText;
+        InfectionData InfectionData;
         int numCases = 0;
         //GeoJsonLayer layer;
 
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
 
+            SetContentView(Resource.Layout.MapLayout);
+            TimeText = FindViewById<TextView>(Resource.Id.timeText);
+            CaseText = FindViewById<TextView>(Resource.Id.casesText);
+            TimeBar = FindViewById<SeekBar>(Resource.Id.timeBar);
+            
+            TimeText.BringToFront();
+            TimeBar.BringToFront();
+            TimeBar.ProgressChanged += new EventHandler<SeekBar.ProgressChangedEventArgs>(TimeBarProgressChanged);
+
+            var mapFragment = (MapFragment)FragmentManager.FindFragmentById(Resource.Id.map);
+            mapFragment.GetMapAsync(this);
+
+        }
         public void OnMapReady(GoogleMap map)
         {
             googleMap = map;
@@ -48,52 +69,80 @@ namespace CoronaVirusTracker
         {
             googleMap.UiSettings.MyLocationButtonEnabled = true;
             googleMap.UiSettings.CompassEnabled = true;
-            googleMap.UiSettings.ZoomControlsEnabled = true;
-            
+            googleMap.UiSettings.ZoomControlsEnabled = false;
             googleMap.MyLocationEnabled = true;
 
         }
 
-        protected override void OnCreate(Bundle bundle)
+
+        protected void TimeBarProgressChanged(object sender, SeekBar.ProgressChangedEventArgs e)
         {
-            base.OnCreate(bundle);
-            SetContentView(Resource.Layout.MapLayout);
-
-            var mapFragment = (MapFragment) FragmentManager.FindFragmentById(Resource.Id.map);
-            mapFragment.GetMapAsync(this);
-
+            int value = Remap(e.Progress, 0, 100, 5, InfectionData.Count-1);
+            TimeText.Text = InfectionData.Dates[value].ToString();
         }
 
-
-        void AnimateToPasschendaele(object sender, EventArgs e)
+        public int Remap(int value, int fromMin, int fromMax, int toMin, float toMax)
         {
-            // Move the camera to the PasschendaeleLatLng Memorial in Belgium.
-            var builder = CameraPosition.InvokeBuilder();
-            builder.Target(PasschendaeleLatLng);
-            builder.Zoom(18);
-            builder.Bearing(155);
-            builder.Tilt(65);
-            var cameraPosition = builder.Build();
+            float fromAbs = value - fromMin;
+            float fromMaxAbs = fromMax - fromMin;
 
-            // AnimateCamera provides a smooth, animation effect while moving
-            // the camera to the the position.
-            googleMap.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+            float normal = fromAbs / fromMaxAbs;
+
+            float toMaxAbs = toMax - toMin;
+            float toAbs = toMaxAbs * normal;
+
+            int to = (int)(toAbs + toMin);
+
+            return to;
         }
 
         void AddMarkersToMap()
         {
             string url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
-            Infections = MarkerMaker.CreateMarkers(url);
+            InfectionData = MarkerMaker.CreateMarkers(url);
             numCases = 0;
-            foreach(Infection aInfection in Infections)
+            foreach(Infection aInfection in InfectionData.Infections)
             {
-                numCases += aInfection.NumCases;
-                MarkerOptions markerOptions = aInfection.MarkerOption.SetIcon(MakeCircle(DpToPx(CirclePxSize(aInfection.NumCases))));
+                int count = aInfection.ConfirmedList.Count-1;
+                numCases += aInfection.ConfirmedList[count].Item2;
+                MarkerOptions markerOptions = aInfection.MarkerOption.SetIcon(MakeCircle(DpToPx(CirclePxSize(aInfection.ConfirmedList[count].Item2))));
                 googleMap.AddMarker(markerOptions);
             }
-            
+            CaseText.Text = "Active Cases: " +numCases;
+        }
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            if (RC_INSTALL_GOOGLE_PLAY_SERVICES == requestCode && resultCode == Result.Ok)
+            {
+                isGooglePlayServicesInstalled = true;
+            }
+            else
+            {
+                Log.Warn(TAG, $"Don't know how to handle resultCode {resultCode} for request {requestCode}.");
+            }
         }
 
+        bool TestIfGooglePlayServicesIsInstalled()
+        {
+            var queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
+            if (queryResult == ConnectionResult.Success)
+            {
+                Log.Info(TAG, "Google Play Services is installed on this device.");
+                return true;
+            }
+
+            if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
+            {
+                var errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
+                Log.Error(TAG, "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
+                //var errorDialog = GoogleApiAvailability.Instance.GetErrorDialog(this, queryResult, RC_INSTALL_GOOGLE_PLAY_SERVICES);
+                //var dialogFrag = new ErrorDialogFragment(errorDialog);
+
+                //dialogFrag.Show(FragmentManager, "GooglePlayServicesDialog");
+            }
+
+            return false;
+        }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             if (requestCode == REQUEST_PERMISSIONS_LOCATION)
@@ -119,7 +168,6 @@ namespace CoronaVirusTracker
                 base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
-
 
 
         private BitmapDescriptor MakeCircle(int d)

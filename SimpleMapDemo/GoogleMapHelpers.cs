@@ -53,7 +53,7 @@ namespace CoronaVirusTracker
 
             var mapFrag = MapFragment.NewInstance(options);
 
-            activity.FragmentManager.BeginTransaction()
+            mapFrag.FragmentManager.BeginTransaction()
                     .Add(resourceId, mapFrag, tag)
                     .Commit();
 
