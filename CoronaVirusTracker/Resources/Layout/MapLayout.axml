@@ -13,35 +13,33 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.MapFragment" />
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:orientation="vertical"
-            android:stretchColumns="2" >
+            />
             <TableRow>
                 <Button
                     android:id="@+id/prevButton"
                     android:background="@android:drawable/ic_media_previous"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="25dp"
                     android:clickable="true"
                     android:layout_column="1"/>
                 <SeekBar
                     android:id="@+id/timeBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="25dp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
                     android:max="100"
                     android:tickMarkTint="#ffffff"
-                    android:layout_column="2"/>
+                    android:layout_column="2"
+                    android:layout_gravity="center_vertical" />
                 <Button
                     android:id="@+id/nextButton"
                     android:background="@android:drawable/ic_media_next"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="25dp"
                     android:clickable="true"
                     android:layout_column="3"/>
             </TableRow>
