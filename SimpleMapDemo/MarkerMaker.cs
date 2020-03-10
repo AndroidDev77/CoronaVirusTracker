@@ -40,6 +40,7 @@ namespace CoronaVirusTracker
         public static InfectionData CreateMarkers(string url)
         {
             //https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv
+            //https://raw.githubusercontent.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
             InfectionData infectionData;
             List<Infection> infections = new List<Infection>();
 

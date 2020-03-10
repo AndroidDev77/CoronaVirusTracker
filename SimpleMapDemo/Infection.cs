@@ -1,24 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-using Android.App;
-using Android.Content;
-using Android.Content.Res;
 using Android.Gms.Maps.Model;
-using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.OS;
-using Android.Runtime;
-using Android.Support.V4.Content;
-using Android.Views;
-using Android.Widget;
-using CsvHelper.Configuration.Attributes;
-using static Android.Graphics.Bitmap;
 
-//https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/01-22-2020.csv
-//https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv
 namespace CoronaVirusTracker
 {
 
@@ -48,10 +33,8 @@ namespace CoronaVirusTracker
                 .SetPosition(this.LatLng)
                 .Anchor(0.5f, 0.5f)
                 .SetAlpha(1.0f)
-                .SetTitle("" + ConfirmedList.Last().Item2)
+                .SetTitle("Active Cases: " + ConfirmedList.Last().Item2)
                 .SetSnippet(this.ProvinceState);
-                //.SetIcon(MakeCircle(dpToPx(CirclePxSize(this.NumCases))));
-            
         }
 
 

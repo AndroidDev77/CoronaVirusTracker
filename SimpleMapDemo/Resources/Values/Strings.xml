@@ -21,4 +21,9 @@
     
     <string name="activity_label_mylocation">My Location</string>
     <string name="activity_description_mylocation">Shows how to perform a permission check along with Maps.</string>
+
+    <string name="comfirmedCasesURL">https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv</string>
+        <string name="deathCasesURL">https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv</string>
+    <string name="recoveredCasesURL">https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv</string>
+  
 </resources>
