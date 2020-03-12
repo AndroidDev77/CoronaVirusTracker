@@ -15,6 +15,9 @@ using Android.Widget;
 using Android.Graphics;
 using Android.Util;
 using Android.Gms.Common;
+using Android.Views;
+using Android.Text;
+using Android.Text.Style;
 
 namespace CoronaVirusTracker
 {
@@ -25,7 +28,7 @@ namespace CoronaVirusTracker
         public static readonly int RC_INSTALL_GOOGLE_PLAY_SERVICES = 1000;
         public static readonly string TAG = "CoronaVirusTracker";
         public static readonly int REQUEST_PERMISSIONS_LOCATION = 1000;
-        bool isGooglePlayServicesInstalled;
+        bool IsGooglePlayServicesInstalled;
         GoogleMap googleMap;
         SeekBar TimeBar;
         TextView TimeText;
@@ -69,6 +72,8 @@ namespace CoronaVirusTracker
             
             AddMarkersToMap();
 
+            googleMap.SetInfoWindowAdapter(new CustomInfoWindowAdapter(this));
+
             if (this.PerformRuntimePermissionCheckForLocation(REQUEST_PERMISSIONS_LOCATION))
             {
                 InitializeUiSettingsOnMap(); 
@@ -81,6 +86,7 @@ namespace CoronaVirusTracker
             googleMap.UiSettings.ZoomControlsEnabled = false;
             googleMap.UiSettings.MapToolbarEnabled = false;
             googleMap.MyLocationEnabled = true;
+            
 
         }
         protected void PrevButtonClicked(object sender, EventArgs e)
@@ -110,24 +116,37 @@ namespace CoronaVirusTracker
             numCases = 0;
             foreach (Infection aInfection in InfectionData.Infections)
             {
-                int count = aInfection.ConfirmedList.Count - 1;
-                int cases = 0;
-                
-                if (count >= timeIndex && timeIndex > 3)
-                    cases = aInfection.ConfirmedList[timeIndex].Item2;
-                else 
-                    cases = aInfection.ConfirmedList[count].Item2;
+                int count = aInfection.InfectionCountList.Count - 1;
+                int comfirmedcases = 0;
+                int deathcases = 0;
+                int recoveredcases = 0;
 
-                if (cases != 0)
+                if (count >= timeIndex && timeIndex > 3)
                 {
-                    numCases += cases;
-                    MarkerOptions markerOptions = aInfection.MarkerOption.SetIcon(MakeCircle(cases))
-                                                                         .SetTitle("Active Cases: " + cases);
+                    comfirmedcases = aInfection.InfectionCountList[timeIndex].Item2.ComfirmedCases;
+                    deathcases = aInfection.InfectionCountList[timeIndex].Item2.DeathCases;
+                    recoveredcases = aInfection.InfectionCountList[timeIndex].Item2.RecoveredCases;
+                }
+                else
+                {
+                    comfirmedcases = aInfection.InfectionCountList[count].Item2.ComfirmedCases;
+                    deathcases = aInfection.InfectionCountList[count].Item2.DeathCases;
+                    recoveredcases = aInfection.InfectionCountList[count].Item2.RecoveredCases;
+                }
+
+                if (comfirmedcases != 0)
+                {
+                    numCases += comfirmedcases;
+                    MarkerOptions markerOptions = aInfection.MarkerOption.SetIcon(MakeCircle(comfirmedcases))
+                                                                         .SetSnippet("Comfirmed: " + comfirmedcases + "\n"+
+                                                                                   "Deaths: " + deathcases + "\n" +
+                                                                                   "Recovered: " + recoveredcases + "\n" +
+                                                                                   "Active: " + (comfirmedcases - recoveredcases - deathcases));
                     googleMap.AddMarker(markerOptions);
                 }
             }
 
-            CaseText.Text = "Active Cases: " + numCases;
+            CaseText.Text = "Comfirmed Cases: " + numCases;
 
         }
 
@@ -148,12 +167,13 @@ namespace CoronaVirusTracker
 
         void AddMarkersToMap()
         {
-            InfectionData = MarkerMaker.CreateMarkers(GetString(Resource.String.comfirmedCasesURL));
+            InfectionData = MarkerMaker.CreateMarkers(GetString(Resource.String.comfirmedCasesURL), GetString(Resource.String.deathCasesURL), GetString(Resource.String.recoveredCasesURL));
+
             numCases = 0;
             foreach(Infection aInfection in InfectionData.Infections)
             {
-                int count = aInfection.ConfirmedList.Count-1;
-                int cases = aInfection.ConfirmedList[count].Item2;
+                int count = aInfection.InfectionCountList.Count-1;
+                int cases = aInfection.InfectionCountList[count].Item2.ComfirmedCases;
                 numCases += cases;
                 MarkerOptions markerOptions = aInfection.MarkerOption.SetIcon(MakeCircle(cases));
                 googleMap.AddMarker(markerOptions);
@@ -165,7 +185,7 @@ namespace CoronaVirusTracker
         {
             if (RC_INSTALL_GOOGLE_PLAY_SERVICES == requestCode && resultCode == Result.Ok)
             {
-                isGooglePlayServicesInstalled = true;
+                IsGooglePlayServicesInstalled = true;
             }
             else
             {
@@ -272,6 +292,68 @@ namespace CoronaVirusTracker
                 size = 10;
 
             return size;
+        }
+
+        /** Demonstrates customizing the info window and/or its contents. */
+        class CustomInfoWindowAdapter : Java.Lang.Object, GoogleMap.IInfoWindowAdapter
+        {
+            MapWithMarkersActivity parent;
+            private readonly RadioGroup mOptions;
+
+            // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
+            // "title" and "snippet".
+            private readonly View mWindow;
+            private readonly View mContents;
+
+            internal CustomInfoWindowAdapter(MapWithMarkersActivity parent)
+            {
+                this.parent = parent;
+                mWindow = parent.LayoutInflater.Inflate(Resource.Layout.custom_info_window, null);
+                mContents = parent.LayoutInflater.Inflate(Resource.Layout.custom_info_contents, null);
+            }
+
+            public View GetInfoWindow(Marker marker)
+            {
+                Render(marker, mWindow);
+                return mWindow;
+            }
+
+            public View GetInfoContents(Marker marker)
+            {
+                Render(marker, mContents);
+                return mContents;
+            }
+
+            private void Render(Marker marker, View view)
+            {
+
+                String title = marker.Title;
+                TextView titleUi = ((TextView)view.FindViewById(Resource.Id.title));
+                if (title != null)
+                {
+                    // Spannable string allows us to edit the formatting of the text.
+                    SpannableString titleText = new SpannableString(title);
+                    SpanTypes st = (SpanTypes)0;
+                    titleText.SetSpan(new ForegroundColorSpan(parent.Resources.GetColor(Resource.Color.colorAccent)), 0, titleText.Length(), st);
+                    titleUi.TextFormatted = (titleText);
+                }
+                else
+                {
+                    titleUi.Text = ("");
+                }
+
+                String snippet = marker.Snippet;
+                TextView snippetUi = ((TextView)view.FindViewById(Resource.Id.snippet));
+                if (snippet != null)
+                {
+                    SpannableString snippetText = new SpannableString(snippet);
+                    snippetUi.TextFormatted = (snippetText);
+                }
+                else
+                {
+                    snippetUi.Text = ("");
+                }
+            }
         }
 
     }

@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,45 +13,40 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.MapFragment" />
-        <TableLayout
+        <Button
+            android:id="@+id/prevButton"
+            android:background="@android:drawable/ic_media_previous"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="30dp"
+            android:clickable="true"
+            android:layout_gravity="left|bottom" />
+        <SeekBar
+            android:id="@+id/timeBar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical"
-            />
-            <TableRow>
-                <Button
-                    android:id="@+id/prevButton"
-                    android:background="@android:drawable/ic_media_previous"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:layout_column="1"/>
-                <SeekBar
-                    android:id="@+id/timeBar"
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:max="100"
-                    android:tickMarkTint="#ffffff"
-                    android:layout_column="2"
-                    android:layout_gravity="center_vertical" />
-                <Button
-                    android:id="@+id/nextButton"
-                    android:background="@android:drawable/ic_media_next"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:layout_column="3"/>
-            </TableRow>
-        </TableLayout>
-
+            android:layout_height="48dp"
+            android:max="100"
+            android:tickMarkTint="#ffffff"
+            android:layout_gravity="bottom|center_horizontal"
+            android:padding="10dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="75dp"
+            android:layout_marginRight="75dp" />
+        <Button
+            android:id="@+id/nextButton"
+            android:background="@android:drawable/ic_media_next"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="30dp"
+            android:clickable="true"
+            android:layout_gravity="right|bottom" />
         <TextView
             android:id="@+id/timeText"
             android:text="Date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:padding="10dp"
+            android:padding="30dp"
             android:textColor="@android:color/background_light"
             android:textSize="18dp"
             android:textStyle="bold" />
@@ -66,6 +61,5 @@
             android:textSize="18dp"
             android:layout_margin="10dp"
             android:padding="10dp"  />
-
     </FrameLayout>
 </LinearLayout>
